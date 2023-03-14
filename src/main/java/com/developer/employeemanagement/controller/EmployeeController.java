@@ -1,43 +1,41 @@
 package com.developer.employeemanagement.controller;
 
-import com.developer.employeemanagement.entity.EmployeeEntity;
-import com.developer.employeemanagement.service.EmployeeService;
+import com.developer.employeemanagement.entity.Employee;
+import com.developer.employeemanagement.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/employee")
 public class EmployeeController {
-    private  final EmployeeService employeeService;
 
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
+    @Autowired
+    private EmployeeRepository empRepository;
+
+    @PostMapping("/saveEmployees")
+    public ResponseEntity<String> saveEmployees(@RequestBody List<Employee> empData) {
+        empRepository.saveAll(empData);
+        return ResponseEntity.ok("Data saved");
     }
 
-    @GetMapping
-    public List<EmployeeEntity> findAllEmployee(){
-        return employeeService.findAllEmployee();
+    @GetMapping("/getEmployees")
+    public List<Employee> getEmployees(){
+        return empRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<EmployeeEntity> findEmployeeById(@PathVariable("id") Long id){
-        return employeeService.findById(id);
+    public Optional<Employee> findEmployeeById(@PathVariable("id") Long id){
+        return empRepository.findById(id);
     }
 
-    @PostMapping
-    public EmployeeEntity saveEmployee(@RequestBody EmployeeEntity employeeEntity) {
-        return  employeeService.saveEmployee(employeeEntity);
+    @DeleteMapping("delete/{empId}")
+    public ResponseEntity removeEmployee(@PathVariable Long empId){
+        empRepository.deleteById(empId);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
-    @PutMapping
-    public EmployeeEntity updateEmployee(@RequestBody EmployeeEntity employeeEntity) {
-        return employeeService.updateEmployee(employeeEntity);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable("id") Long id) {
-        employeeService.deleteEmployee(id);
-    }
 }
